@@ -1,0 +1,79 @@
+1.	Create USER table 
+create table users(
+userid integer not null distkey sortkey,
+username char(8),
+firstname varchar(30),
+lastname varchar(30),
+city varchar(30),
+state char(2),
+email varchar(100),
+phone char(14),
+likesports boolean,
+liketheatre boolean,
+likeconcerts boolean,
+likejazz boolean,
+likeclassical boolean,
+likeopera boolean,
+likerock boolean,
+likevegas boolean,
+likebroadway boolean,
+likemusicals boolean);
+
+2.	Create DATE table
+create table date(
+dateid smallint not null distkey sortkey,
+caldate date not null,
+day character(3) not null,
+week smallint not null,
+month character(5) not null,
+qtr character(5) not null,
+year smallint not null,
+holiday boolean default('N'));
+
+3.	Create SALES table
+create table sales(
+salesid integer not null,
+listid integer not null distkey,
+sellerid integer not null,
+buyerid integer not null,
+eventid integer not null,
+dateid smallint not null sortkey,
+qtysold smallint not null,
+pricepaid decimal(8,2),
+commission decimal(8,2),
+saletime timestamp);
+
+4.	Copy USERS data
+
+copy users from 's3://awssampledbuswest2/tickit/allusers_pipe.txt'
+credentials 'aws_iam_role=arn:aws:iam::505659163672:role/myRedshiftRole'
+delimiter '|' region 'us-west-2';
+
+5.	Copy DATE data
+
+copy date from 's3://awssampledbuswest2/tickit/date2008_pipe.txt'
+credentials 'aws_iam_role=arn:aws:iam::505659163672:role/myRedshiftRole'
+delimiter '|' region 'us-west-2';
+
+6.	Copy SALES data
+
+copy sales from 's3://awssampledbuswest2/tickit/sales_tab.txt'
+credentials 'aws_iam_role=arn:aws:iam::505659163672:role/myRedshiftRole'
+delimiter '\t' timeformat 'MM/DD/YYYY HH:MI:SS' region 'us-west-2';
+
+
+7.	Find the carbon emissions of Motor Gasoline - Gasoline Heavy-duty Vehicles for 2020 and 2021. 
+ 
+select sum(emissions_factor_amount) 
+from calculated_emissions 
+where activity = 'Motor Gasoline - Gasoline Heavy-duty Vehicles';
+
+
+8.	Find the overall scope 2 emissions from the electricity consumption for the year 2021
+
+select sum(emissions_factor_amount) 
+from calculated_emissions 
+where scope = '2' 
+and origin_measurement_timestamp like '2021%';
+
+
